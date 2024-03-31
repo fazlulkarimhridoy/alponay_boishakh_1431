@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DrawingCanvas from "../../components/DrawingCanvas";
 import img from "/DarkBG-01.png";
 const Alpona = () => {
@@ -8,68 +8,42 @@ const Alpona = () => {
   const [eraseSize, setEraseSize] = useState(10);
   const [isDrawing, setIsDrawing] = useState(false);
   const [selectedTool, setSelectedTool] = useState("brush");
-  const [prevMouseX, setPrevMouseX] = useState(null);
-  const [prevMouseY, setPrevMouseY] = useState(null);
-  //   var prevMouseX, prevMouseY;
+  const [prevMouseX, setPrevMouseX] = useState(100);
+  const [prevMouseY, setPrevMouseY] = useState(100);
+  const [finalMouseX, setFinalMouseX] = useState(100);
+  const [finalMouseY, setFinalMouseY] = useState(100);
 
   const startDrawing = (event) => {
     setIsDrawing(true);
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
+
+    // context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+
     const rect = canvas.getBoundingClientRect();
     const offsetX = event.touches
       ? event.touches[0].clientX - rect.left
       : event.clientX - rect.left;
+
     const offsetY = event.touches
       ? event.touches[0].clientY - rect.top
       : event.clientY - rect.top;
-    console.log(offsetX, offsetY);
-
     setPrevMouseX(offsetX);
     setPrevMouseY(offsetY);
-
     console.log(selectedTool);
     context.beginPath();
-    context.moveTo(prevMouseX, prevMouseY);
-  };
-  console.log(prevMouseX, prevMouseY);
-
-  const eraseWithCircle = (context, x, y, radius) => {
-    context.save();
-    context.beginPath();
-    context.arc(x, y, radius, 0, 2 * Math.PI, false);
-    context.clip();
-    context.lineCap = "round";
-    context.globalCompositeOperation = "destination-out"; // Set the eraser mode
-    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-    context.restore();
-  };
-
-  const straightLine = (event) => {
-    console.log(selectedTool);
-    const canvas = canvasRef.current;
-    const context = canvas.getContext("2d");
-    context.lineCap = "round";
-    const rect = canvas.getBoundingClientRect();
-
-    const offsetX = event.touches
-      ? event.touches[0].clientX - rect.left
-      : event.clientX - rect.left;
-    const offsetY = event.touches
-      ? event.touches[0].clientY - rect.top
-      : event.clientY - rect.top;
-
-    context.beginPath();
-
-    console.log(prevMouseX, prevMouseY);
-    // context.moveTo(prevMouseX, prevMouseY);
-    context.lineTo(offsetX, offsetY);
-    context.lineCap = "round";
-    context.stroke();
+    if (selectedTool === "line") {
+      context.moveTo(prevMouseX, prevMouseY);
+      context.stroke();
+    } else {
+      context.moveTo(offsetX, offsetY);
+    }
   };
 
   const draw = (event) => {
     if (!isDrawing) return;
+
+    console.log(prevMouseX, prevMouseY);
     // console.log("updraw");
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
@@ -86,27 +60,118 @@ const Alpona = () => {
       : event.clientY - rect.top;
 
     if (selectedTool === "eraser") {
-      const radius = eraseSize; // Adjust the radius based on stroke size
+      const radius = eraseSize;
       eraseWithCircle(context, offsetX, offsetY, radius);
     } else if (selectedTool === "line") {
-      console.log(prevMouseX, prevMouseY);
-      straightLine(event);
+      // context.beginPath();
+      // context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+      context.moveTo(prevMouseX, prevMouseY);
+
+      context.lineTo(offsetX, offsetY);
+      // context.stroke();
+    } else if (selectedTool === "circle") {
+      context.beginPath();
+      let radius = Math.sqrt(
+        Math.pow(prevMouseX - offsetX, 2) + Math.pow(prevMouseY - offsetY, 2)
+      );
+      context.arc(prevMouseX, prevMouseY, radius, 0, 2 * Math.PI); // creating circle according to the mouse pointer
+
+      context.stroke();
     } else {
       context.lineTo(offsetX, offsetY);
       context.stroke();
       context.beginPath();
       context.moveTo(offsetX, offsetY);
     }
+
+    // setPrevMouseX(offsetX);
+    // setPrevMouseY(offsetY);
     // console.log("downdraw");
   };
 
-  const stopDrawing = () => {
+  const straightLine = (event) => {
+    // console.log(selectedTool);
+    // const canvas = canvasRef.current;
+    // const context = canvas.getContext("2d");
+    // context.lineCap = "round";
+    const rect = canvas.getBoundingClientRect();
+
+    const offsetX = event.touches
+      ? event.touches[0].clientX - rect.left
+      : event.clientX - rect.left;
+    const offsetY = event.touches
+      ? event.touches[0].clientY - rect.top
+      : event.clientY - rect.top;
+
+    context.beginPath();
+
+    // console.log(prevMouseX, prevMouseY);
+    console.log(prevMouseX, prevMouseY);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.moveTo(prevMouseX, prevMouseY);
+    // context.moveTo(prevMouseX, prevMouseY);
+    // console.log(sprevMouseX, sprevMouseX);
+    // context.lineTo(sprevMouseX, sprevMouseX);
+    console.log(offsetX, offsetY);
+    context.lineTo(offsetX, offsetY);
+    context.lineCap = "round";
+    context.stroke();
+  };
+  // draw a line
+  const drawLine = (info) => {
+    const { x, y, x1, y1 } = info;
+
+    context.beginPath();
+    context.moveTo(x, y);
+    // context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+    context.lineTo(x1, y1);
+    context.strokeStyle = color;
+    context.lineWidth = strokeSize;
+    context.stroke();
+  };
+  const stopDrawing = (event) => {
     setIsDrawing(false);
     const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
+    const rect = canvas.getBoundingClientRect();
+
+    const offsetX = event.touches
+      ? event.touches[0].clientX - rect.left
+      : event.clientX - rect.left;
+    const offsetY = event.touches
+      ? event.touches[0].clientY - rect.top
+      : event.clientY - rect.top;
+
+    context.beginPath();
+    context.moveTo(prevMouseX, prevMouseY);
+    context.lineTo(offsetX, offsetY);
+    context.stroke();
+
+    // const canvas = canvasRef.current;
     canvas.removeEventListener("mousemove", draw);
     canvas.removeEventListener("mouseup", stopDrawing);
     canvas.removeEventListener("touchmove", draw);
     canvas.removeEventListener("touchend", stopDrawing);
+  };
+  // Add event listeners
+  // canvas.addEventListener("mousedown", startDrawing);
+  // canvas.addEventListener("mousemove", draw);
+  // canvas.addEventListener("mouseup", stopDrawing);
+  //   var prevMouseX, prevMouseY;
+
+  // console.log(prevMouseX, prevMouseY);
+
+  const eraseWithCircle = (context, x, y, radius) => {
+    // const canvas = canvasRef.current;
+    // const context = canvas.getContext("2d");
+    context.save();
+    context.beginPath();
+    context.arc(x, y, radius, 0, 2 * Math.PI, false);
+    context.clip();
+    context.lineCap = "round";
+    context.globalCompositeOperation = "destination-out"; // Set the eraser mode
+    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+    context.restore();
   };
 
   const clearCanvas = () => {
@@ -279,14 +344,18 @@ const Alpona = () => {
             tabIndex={1}
             className="dropdown-content z-[1] menu p-1 shadow bg-[#662E91] rounded-sm w-40 mt-1"
           >
-            <div className="bg-[#CAE6FF] flex items-center gap-1 md:gap-3 p-1.5 md:p-3.5 rounded-md border border-black">
-              <img
-                id="line"
-                className="option tool w-[10px] md:w-[20px]"
-                src="/Line-6.png"
-                alt="line-6"
+            <div className="bg-[#CAE6FF] flex items-center gap-1 md:gap-3  rounded-md border border-black">
+              <div
+                className="p-2 hover:bg-red-700"
                 onClick={() => setSelectedTool("line")}
-              />
+              >
+                <img
+                  id="line"
+                  className="option tool w-[10px] md:w-[20px]"
+                  src="/Line-6.png"
+                  alt="line-6"
+                />
+              </div>
               <img
                 id="circle"
                 className="option tool w-[10px] md:w-[20px]"
@@ -491,49 +560,6 @@ const Alpona = () => {
           onMouseUp={stopDrawing}
           onTouchEnd={stopDrawing}
         />
-      </div>
-      {/* <!-- templates --> */}
-      <div className="hidden bg-slate-200 px-4 md:px-20 pt-5 lg:pt-10 pb-5 lg:pb-10">
-        <h2 className="mb-5 text-center">Use Template</h2>
-        <div className="flex items-center justify-between">
-          <img
-            id="banglalinkLogo"
-            className="w-12 md:w-20 lg:w-40 bg-white p-2 border border-black hidden"
-            src="/banglalink.jpg"
-            alt="banglalink"
-          />
-          <img
-            id="alpona1"
-            className="w-12 md:w-20 lg:w-40 bg-white p-2 border border-black"
-            src="/alpona1.png"
-            alt="alpona1"
-          />
-          <img
-            className="w-12 md:w-20 lg:w-40 bg-white p-2 border border-black"
-            src="/alpona2.png"
-            alt="alpona2"
-          />
-          <img
-            className="w-12 md:w-20 lg:w-40 bg-white p-2 border border-black"
-            src="/alpona3.png"
-            alt="alpona3"
-          />
-          <img
-            className="w-12 md:w-20 lg:w-40 bg-white p-2 border border-black"
-            src="/alpona4.png"
-            alt="alpona4"
-          />
-          <img
-            className="w-12 md:w-20 lg:w-40 bg-white p-2 border border-black"
-            src="/alpona5.png"
-            alt="alpona5"
-          />
-          <img
-            className="w-12 md:w-20 lg:w-40 bg-white p-2 border border-black"
-            src="/alpona6.png"
-            alt="alpona6"
-          />
-        </div>
       </div>
     </section>
   );

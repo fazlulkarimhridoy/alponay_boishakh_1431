@@ -9,6 +9,7 @@ import Root from './Root';
 import ErrorPage from './components/ErrorPage';
 import Home from './Pages/Home/Home';
 import Alpona from './Pages/Alpona/Alpona';
+import AlponaTest from './Pages/AlponaTest/AlponaTest';
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
       {
         path: "/alpona",
         element: <Alpona />
+      },
+      {
+        path: "/alponatest",
+        element: <AlponaTest />
       }
     ]
   },
