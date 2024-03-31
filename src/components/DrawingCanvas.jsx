@@ -15,10 +15,11 @@ const bgImage = {
 
 const DrawingCanvas = () => {
     const canvasRef = useRef(null);
-    const [color, setColor] = useState('#000000');
+    const [color, setColor] = useState('#ffffff');
     const [strokeSize, setStrokeSize] = useState(5);
     const [isEraser, setIsEraser] = useState(false);
 
+    // useEffect for canvas logo
     useEffect(() => {
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
@@ -36,6 +37,7 @@ const DrawingCanvas = () => {
         };
     }, []);
 
+    // draw function
     const draw = (event) => {
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
@@ -59,6 +61,7 @@ const DrawingCanvas = () => {
         }
     };
 
+    // start draw
     const startDrawing = (event) => {
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
@@ -72,6 +75,7 @@ const DrawingCanvas = () => {
         canvas.addEventListener('touchend', stopDrawing);
     };
 
+    // stop draw
     const stopDrawing = () => {
         const canvas = canvasRef.current;
         canvas.removeEventListener('mousemove', draw);
@@ -80,12 +84,14 @@ const DrawingCanvas = () => {
         canvas.removeEventListener('touchend', stopDrawing);
     };
 
+    // clear canvas
     const clearCanvas = () => {
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
         context.clearRect(0, 0, canvas.width, canvas.height);
     };
 
+    // save drawing
     const saveDrawing = () => {
         const canvas = canvasRef.current;
         const dataUrl = canvas.toDataURL('image/png');
@@ -100,13 +106,13 @@ const DrawingCanvas = () => {
             <canvas
                 ref={canvasRef}
                 width={window.innerWidth}
-                height="600px"
+                height="800px"
                 onMouseDown={startDrawing}
                 onTouchStart={startDrawing}
                 style={bgImage}
             >
             </canvas>
-            <div className='flex flex-row items-center justify-center gap-10'>
+            <div className='flex flex-row items-center justify-center gap-10 bg-sky-200 px-10 py-5 rounded-full'>
                 <input
                     type="color"
                     value={color}
