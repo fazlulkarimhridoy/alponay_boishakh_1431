@@ -5,6 +5,7 @@ import ErrorLine2 from "../../assets/ErrorLine2.png"
 import BodyLogo from "../../assets/BodyLogo.png"
 import AlponaLine2 from "../../assets/AlponaLine2.png"
 import AlponaLine from "../../assets/AlponaLine.png"
+import RegiAlpona from "../../assets/RegistrationAlpona.png"
 
 
 const Registration = () => {
@@ -33,7 +34,7 @@ const Registration = () => {
                 <img className="w-[250px]" src={BodyLogo} alt="body-logo" />
             </div>
 
-            <div className="flex flex-col items-center justify-center w-[500px] mx-auto bg-[#5A308C] rounded-xl my-10">
+            <div className="relative flex flex-col items-center justify-center w-[500px] mx-auto bg-[#5A308C] rounded-xl my-10">
                 <form className="my-10 px-10">
                     <p className="text-white font-bold text-2xl">আপনার আল্পনাটি নিবন্ধন করুন</p>
                     <div className="mt-3">
@@ -56,6 +57,7 @@ const Registration = () => {
                         <button className="text-white bg-[#F77C3C] border-4 border-white font-bold text-xl px-8 rounded-lg py-2">পাঠিয়ে দিন</button>
                     </div>
                 </form>
+                <img className="absolute -right-[215px] h-[425px]" src={RegiAlpona} />
             </div>
 
             <div className="flex overflow-hidden">
